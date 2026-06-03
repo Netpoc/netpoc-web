@@ -1,0 +1,151 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   Netpoc design system
+   African-night base · Ankara accents · glassmorphic surfaces
+   ============================================================ */
+@theme {
+  /* Surfaces */
+  --color-void: #080714;
+  --color-night: #0b0a1a;
+  --color-night-2: #14122b;
+  --color-night-3: #1d1a3a;
+
+  /* Ink */
+  --color-ivory: #f5f2ea;
+  --color-mist: #b6b2cf;
+  --color-muted: #837fa6;
+
+  /* Ankara-inspired accents */
+  --color-saffron: #f7b733;
+  --color-coral: #ff5e5b;
+  --color-terracotta: #e06236;
+  --color-emerald: #1fb58f;
+  --color-violet: #a64bf4;
+  --color-indigo: #5b6bff;
+
+  /* Type */
+  --font-display: 'Bricolage Grotesque', 'Georgia', serif;
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, monospace;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-night);
+    color: var(--color-ivory);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.04;
+  }
+
+  ::selection {
+    background: var(--color-saffron);
+    color: var(--color-void);
+  }
+
+  /* Honour reduced-motion preferences across the whole site */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Frosted glass panel — the core glassmorphism primitive */
+  .glass {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-ivory) 9%, transparent),
+      color-mix(in srgb, var(--color-ivory) 3%, transparent)
+    );
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid color-mix(in srgb, var(--color-ivory) 14%, transparent);
+    box-shadow:
+      0 8px 32px -8px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 0 color-mix(in srgb, var(--color-ivory) 18%, transparent);
+  }
+
+  .glass-strong {
+    background: color-mix(in srgb, var(--color-night-2) 70%, transparent);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid color-mix(in srgb, var(--color-ivory) 12%, transparent);
+  }
+
+  /* Warm Ankara-toned gradient text for headlines */
+  .text-ankara {
+    background: linear-gradient(
+      100deg,
+      var(--color-saffron),
+      var(--color-coral) 45%,
+      var(--color-violet)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-mist);
+  }
+}
+
+@layer utilities {
+  /* Scroll-reveal: paired with the useReveal composable */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.8s var(--ease-out-expo),
+      transform 0.8s var(--ease-out-expo);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .glow-saffron {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-saffron) 40%, transparent),
+      0 12px 40px -8px color-mix(in srgb, var(--color-saffron) 35%, transparent);
+  }
+}
