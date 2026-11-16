@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import logo from '@/assets/brand/netpoc-white.png'
 import NsibidiPattern from './NsibidiPattern.vue'
+import CultureFigure from './CultureFigure.vue'
+import NsibidiGlossary from './NsibidiGlossary.vue'
 
 const year = new Date().getFullYear()
 
@@ -20,6 +22,7 @@ const columns = [
       { to: '/services#iot', label: 'IoT & Telematics' },
       { to: '/services#ussd', label: 'USSD Solutions' },
       { to: '/services#agric', label: 'Agric Tech' },
+      { to: '/fuelpay', label: 'FuelPay' },
     ],
   },
 ]
@@ -30,7 +33,7 @@ const columns = [
     <NsibidiPattern :opacity="0.05" :scale="170" color="var(--color-ivory)" />
     <div class="footer__inner">
       <div class="footer__brand">
-        <img :src="logo" alt="Netpoc" class="footer__logo" />
+        <img :src="logo" alt="Πέτρος" class="footer__logo" />
         <p class="footer__motto text-ankara">Value-Driven Innovation</p>
         <p class="footer__tagline">
           African tech engineered from silicon to software.
@@ -48,7 +51,14 @@ const columns = [
           {{ link.label }}
         </RouterLink>
       </div>
+
+      <!-- Bust rising from the footer: headdress + shoulders, the rest cropped -->
+      <div class="footer__figure">
+        <CultureFigure name="man-headdress" animate :ground="false" height="460px" />
+      </div>
     </div>
+
+    <NsibidiGlossary />
 
     <div class="footer__base">
       <span>© {{ year }} Netpoc Inc Limited. All rights reserved.</span>
@@ -85,8 +95,19 @@ const columns = [
   margin: 0 auto;
   padding: 4rem 1.5rem 2rem;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr auto;
   gap: 2.5rem;
+}
+.footer__figure {
+  align-self: end;
+  height: 210px;
+  margin-bottom: -2rem;
+  overflow: hidden;
+}
+@media (max-width: 960px) {
+  .footer__figure {
+    display: none;
+  }
 }
 .footer__logo {
   height: 38px;

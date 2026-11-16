@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useReveal } from '@/composables/useReveal'
 import AnkaraPattern from '@/components/AnkaraPattern.vue'
 import GlassCard from '@/components/GlassCard.vue'
+import CultureFigure from '@/components/CultureFigure.vue'
 
 const root = ref<HTMLElement | null>(null)
 useReveal(root)
@@ -35,8 +36,11 @@ const values = [
         </p>
       </div>
 
-      <div class="intro__art reveal" aria-hidden="true">
-        <AnkaraPattern :scale="120" :opacity="0.9" />
+      <div class="intro__visual reveal">
+        <div class="intro__art" aria-hidden="true">
+          <AnkaraPattern :scale="120" :opacity="0.9" />
+        </div>
+        <CultureFigure class="intro__figure" name="family" infill="ankara" animate height="108%" />
       </div>
     </section>
 
@@ -80,8 +84,19 @@ const values = [
 .intro__text strong {
   color: var(--color-ivory);
 }
+.intro__visual {
+  position: relative;
+  aspect-ratio: 1;
+}
+.intro__figure {
+  position: absolute;
+  left: 50%;
+  bottom: -4%;
+  translate: -50% 0;
+}
 .intro__art {
   position: relative;
+  height: 100%;
   aspect-ratio: 1;
   border-radius: 2rem;
   overflow: hidden;
@@ -107,8 +122,10 @@ const values = [
   .intro {
     grid-template-columns: 1fr;
   }
-  .intro__art {
+  .intro__visual {
     max-width: 360px;
+    width: 100%;
+    margin: 0 auto;
   }
 }
 </style>

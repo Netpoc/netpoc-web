@@ -5,6 +5,7 @@ import { useReveal } from '@/composables/useReveal'
 import NsibidiPattern from '@/components/NsibidiPattern.vue'
 import AnkaraPattern from '@/components/AnkaraPattern.vue'
 import GlassCard from '@/components/GlassCard.vue'
+import CultureFigure from '@/components/CultureFigure.vue'
 
 const root = ref<HTMLElement | null>(null)
 useReveal(root)
@@ -29,7 +30,7 @@ const stats = [
   <div ref="root" class="home">
     <!-- ============ HERO ============ -->
     <section class="hero">
-      <NsibidiPattern class="hero__nsibidi" :opacity="0.07" color="var(--color-ivory)" />
+      <NsibidiPattern class="hero__nsibidi" variant="ukara" :scale="200" :opacity="0.08" color="var(--color-ivory)" />
 
       <div class="hero__content">
         <span class="pill glass reveal">
@@ -64,6 +65,11 @@ const stats = [
       <div class="hero__ankara" aria-hidden="true">
         <AnkaraPattern :scale="110" :opacity="0.9" />
       </div>
+
+      <!-- Signature figure: stands in front of the Ankara sun and waves -->
+      <div class="hero__figure reveal" style="transition-delay: 200ms">
+        <CultureFigure name="woman-waving" animate height="100%" />
+      </div>
     </section>
 
     <!-- ============ SERVICES ============ -->
@@ -93,6 +99,7 @@ const stats = [
     <section class="section">
       <div class="cta reveal">
         <AnkaraPattern class="cta__pattern" :scale="130" :opacity="0.12" />
+        <CultureFigure class="cta__figure" name="man-standing" palette="ankara" mirror :ground="false" height="380px" />
         <div class="cta__inner glass-strong">
           <h2>Let's build something the continent is proud of.</h2>
           <p>Tell us about your idea — hardware, software, or both.</p>
@@ -168,6 +175,14 @@ const stats = [
   color: var(--color-muted);
   font-family: var(--font-mono);
 }
+.hero__figure {
+  position: absolute;
+  right: 6%;
+  bottom: 2rem;
+  height: min(600px, 78%);
+  display: flex;
+  align-items: flex-end;
+}
 .hero__ankara {
   position: absolute;
   top: -10%;
@@ -178,34 +193,6 @@ const stats = [
   overflow: hidden;
   opacity: 0.5;
   mask-image: radial-gradient(circle, black 40%, transparent 70%);
-}
-
-/* Buttons */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.85rem 1.5rem;
-  border-radius: 999px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: transform 0.3s var(--ease-out-expo), filter 0.3s ease, background 0.3s ease;
-}
-.btn--primary {
-  background: linear-gradient(100deg, var(--color-saffron), var(--color-coral));
-  color: var(--color-void);
-}
-.btn--primary:hover {
-  transform: translateY(-3px);
-  filter: brightness(1.08);
-}
-.btn--ghost {
-  color: var(--color-ivory);
-  border: 1px solid color-mix(in srgb, var(--color-ivory) 22%, transparent);
-}
-.btn--ghost:hover {
-  transform: translateY(-3px);
-  background: color-mix(in srgb, var(--color-ivory) 6%, transparent);
 }
 
 /* Sections */
@@ -258,6 +245,12 @@ const stats = [
 .cta__pattern {
   inset: 0;
 }
+.cta__figure {
+  position: absolute;
+  left: 4%;
+  bottom: -26%;
+  z-index: 1;
+}
 .cta__inner {
   position: relative;
   border-radius: 2rem;
@@ -272,5 +265,33 @@ const stats = [
 .cta__inner p {
   color: var(--color-mist);
   margin-bottom: 2rem;
+}
+</style>
+
+<style scoped>
+/* Figures: copy always paints above the hero figure; it moves under the copy on small screens; accents hide */
+.hero__content {
+  z-index: 2;
+}
+@media (max-width: 1080px) {
+  .hero__figure {
+    right: 0;
+    height: min(480px, 60%);
+    opacity: 0.55;
+  }
+}
+@media (max-width: 960px) {
+  .hero__figure {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    height: 300px;
+    opacity: 1;
+    justify-content: center;
+    margin-top: 2.5rem;
+  }
+  .cta__figure {
+    display: none;
+  }
 }
 </style>

@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue'
 import { useReveal } from '@/composables/useReveal'
 import NsibidiPattern from '@/components/NsibidiPattern.vue'
+import CultureFigure from '@/components/CultureFigure.vue'
 
 const root = ref<HTMLElement | null>(null)
 useReveal(root)
@@ -26,7 +27,7 @@ function submit() {
 
 <template>
   <div ref="root" class="page">
-    <NsibidiPattern :opacity="0.05" color="var(--color-ivory)" />
+    <NsibidiPattern variant="ukara" :scale="200" :opacity="0.05" color="var(--color-ivory)" />
 
     <div class="contact reveal">
       <div class="contact__intro">
@@ -37,26 +38,27 @@ function submit() {
           between. We'll get back to you quickly.
         </p>
         <a class="contact__email" href="mailto:hello@netpoc.com">hello@netpoc.com</a>
+        <CultureFigure class="contact__figure" name="couple-with-pots" height="340px" />
       </div>
 
       <form v-if="!submitted" class="contact__form glass-strong" @submit.prevent="submit">
         <label>
           <span>Name</span>
-          <input v-model="form.name" type="text" required placeholder="Your name" />
+          <input v-model="form.name" class="field" type="text" required placeholder="Your name" />
         </label>
         <label>
           <span>Email</span>
-          <input v-model="form.email" type="email" required placeholder="you@company.com" />
+          <input v-model="form.email" class="field" type="email" required placeholder="you@company.com" />
         </label>
         <label>
           <span>Interested in</span>
-          <select v-model="form.interest">
+          <select v-model="form.interest" class="field">
             <option v-for="i in interests" :key="i">{{ i }}</option>
           </select>
         </label>
         <label>
           <span>Project details</span>
-          <textarea v-model="form.message" rows="4" required placeholder="What are you building?" />
+          <textarea v-model="form.message" class="field" rows="4" required placeholder="What are you building?" />
         </label>
         <button type="submit" class="btn btn--primary">Send message</button>
       </form>
@@ -94,6 +96,15 @@ function submit() {
   line-height: 1.7;
   max-width: 40ch;
 }
+.contact__figure {
+  display: block;
+  margin-top: 3rem;
+}
+@media (max-width: 760px) {
+  .contact__figure {
+    display: none;
+  }
+}
 .contact__email {
   display: inline-block;
   margin-top: 1.5rem;
@@ -115,51 +126,6 @@ label {
   gap: 0.45rem;
   font-size: 0.85rem;
   color: var(--color-mist);
-}
-input,
-select,
-textarea {
-  font: inherit;
-  color: var(--color-ivory);
-  background: color-mix(in srgb, var(--color-void) 50%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-ivory) 14%, transparent);
-  border-radius: 0.75rem;
-  padding: 0.75rem 0.9rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-input::placeholder,
-textarea::placeholder {
-  color: var(--color-muted);
-}
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: var(--color-saffron);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-saffron) 22%, transparent);
-}
-textarea {
-  resize: vertical;
-}
-.btn {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.85rem 1.5rem;
-  border-radius: 999px;
-  font-weight: 600;
-  border: 0;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: transform 0.3s var(--ease-out-expo), filter 0.3s ease;
-}
-.btn--primary {
-  background: linear-gradient(100deg, var(--color-saffron), var(--color-coral));
-  color: var(--color-void);
-}
-.btn--primary:hover {
-  transform: translateY(-3px);
-  filter: brightness(1.08);
 }
 .contact__thanks {
   justify-content: center;

@@ -8,6 +8,7 @@ const open = ref(false)
 
 const links = [
   { to: '/services', label: 'Services' },
+  { to: '/fuelpay', label: 'FuelPay' },
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },
 ]
@@ -17,7 +18,7 @@ const links = [
   <header class="nav" :class="{ 'nav--solid': y > 24 }">
     <div class="nav__inner">
       <RouterLink to="/" class="nav__brand" @click="open = false">
-        <img :src="logo" alt="Netpoc" class="nav__logo" />
+        <img :src="logo" alt="Πέτρος" class="nav__logo" />
       </RouterLink>
 
       <nav class="nav__links" :class="{ 'nav__links--open': open }">

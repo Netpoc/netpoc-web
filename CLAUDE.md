@@ -31,7 +31,7 @@ Nsibidi is an indigenous West African (notably Igbo/Cross River) ideographic wri
 ## Resources (`/Resource`)
 
 - `nsibidi dictionary.pdf` — Nsibidi symbol reference. Read this to source authentic ideographs for patterns, section dividers, iconography, and background motifs. (Large file — read targeted page ranges, not the whole PDF.)
-- `Netpoc.png` — logo for light backgrounds
+- `Netpoc.png` — logo for light backgrounds. The wordmark reads **Πέτρος**, the company's official name — use it as the logo's `alt` text.
 - `Netpoc_White.png` — logo for dark/colored backgrounds
 - `Icon (1).png` — app/favicon icon
 
@@ -50,13 +50,15 @@ Use these skills for the corresponding work — they carry detailed rules and pr
 
 The design system is the spine of this codebase — most work flows through it rather than around it.
 
-- **`src/style.css`** — the single source of design truth. Tailwind v4 `@theme` tokens define the palette (African-night surfaces `--color-void/night/...`, Ankara accents `--color-saffron/coral/terracotta/emerald/violet/indigo`), fonts (`--font-display` Bricolage Grotesque, `--font-sans` Manrope, `--font-mono` Space Mono), and motion easing. Component classes `.glass` / `.glass-strong` (the glassmorphism primitive), `.text-ankara`, `.pill`, and the `.reveal`/`.is-visible` scroll-reveal utility live here. **Change tokens here, not in components.** The global `prefers-reduced-motion` reset also lives here.
+- **`src/style.css`** — the single source of design truth. Tailwind v4 `@theme` tokens define the palette (African-night surfaces `--color-void/night/...`, Ankara accents `--color-saffron/coral/terracotta/emerald/violet/indigo`), fonts (`--font-display` Bricolage Grotesque, `--font-sans` Manrope, `--font-mono` Space Mono), and motion easing. Component classes `.glass` / `.glass-strong` (the glassmorphism primitive), `.btn` (`--primary` / `--ghost` / `--outline` / `--sm`), `.field` (form controls), `.text-ankara`, `.pill`, and the `.reveal`/`.is-visible` scroll-reveal utility live here. **Change tokens here, not in components.** The global `prefers-reduced-motion` reset also lives here.
 - **`src/components/`** — reusable building blocks:
-  - `NsibidiPattern.vue` / `AnkaraPattern.vue` — SVG `<pattern>` background fields (props: `opacity`, `scale`, `color`). The Nsibidi glyphs are *stylised placeholders*; see the design note in that file and the guardrail below.
+  - `NsibidiPattern.vue` / `AnkaraPattern.vue` — SVG `<pattern>` background fields (props: `opacity`, `scale`, `color`). Nsibidi fields draw **authentic glyphs** from `src/content/nsibidi.ts` (dictionary entry numbers, meanings, origin) in themed sets — one per page via route `meta.nsibidi` — with `variant` `print` (default) or `ukara` (cloth grid, use sparingly). `NsibidiGlossary.vue` in the footer names the page's glyphs. Rules, licence note and sets: `docs/brand/nsibidi.md`.
   - `GlassCard.vue` — the frosted-panel primitive (`interactive` prop adds hover lift/glow).
+  - `CultureFigure.vue` — the people-illustration primitive (`name`, `palette` heritage/ankara/night, `infill`, `animate`). Figures in `src/components/figures/` are **generated** by `npm run figures` from `src/assets/illustrations/source/*.svg` — never edit them by hand. Rules, palettes and placements: `docs/brand/illustrations.md`. Dev-only preview of every variant at `/__figures`.
   - `SiteNav.vue` / `SiteFooter.vue` — global chrome, rendered once in `App.vue` (outside `<RouterView>`).
 - **`src/App.vue`** — fixed ambient `.aurora` glow layer (`z-index: -1`), nav, the `<RouterView>` with an `out-in` page `<Transition>`, and footer.
-- **`src/views/`** — one component per route: `HomeView`, `ServicesView`, `AboutView`, `ContactView` (Home is eager-loaded in the router; the rest are lazy `import()`).
+- **`src/views/`** — one component per route: `HomeView`, `ServicesView`, `AboutView`, `ContactView`, `FuelPayView` (`/fuelpay`, product page) and `BookPocView` (`/fuelpay/book-poc`, full-page PoC form used on mobile). Home is eager-loaded in the router; the rest are lazy `import()`.
+- **FuelPay page** — all copy, links and form options live in `src/content/fuelpay.ts` (edit text there, not in templates). Sections are in `src/components/fuelpay/`. `provideFuelPay()` / `useFuelPay()` (`src/composables/useFuelPay.ts`) share the active segment, calculator values, UTMs and the `openPoc()` / `demoHref()` launchers; the form logic is `usePocForm.ts`. Any `[BRACKETED]` text in copy renders as a visible coral "to confirm" chip via `TbcCopy.vue` — `grep -n "\[" src/content/fuelpay.ts` lists what's outstanding before go-live. The PoC submit is a stub (`send()` in `usePocForm.ts`) until the API exists. `src/lib/track.ts` pushes analytics events to `window.dataLayer`.
 - **`src/router/index.ts`** — routes + `scrollBehavior` (handles hash anchors like `/services#soc` with a 96px offset for the fixed nav) + an `afterEach` that sets `document.title` from each route's `meta.title`.
 - **`src/composables/useReveal.ts`** — `useReveal(rootRef)` wires an `IntersectionObserver` that adds `.is-visible` to any `.reveal` element inside `rootRef` as it scrolls into view. Each view holds a `ref` on its root element and calls this; stagger reveals with inline `transition-delay`.
 
@@ -66,6 +68,6 @@ The design system is the spine of this codebase — most work flows through it r
 
 ## Design Guardrails
 
-- **Authenticity over pastiche**: Nsibidi symbols carry meaning. The glyphs in `NsibidiPattern.vue` today are *stylised, geometry-driven placeholders* — a known follow-up is to replace them with authentic ideographs sourced from `Resource/nsibidi dictionary.pdf`, respecting each symbol's significance. When in doubt, cross-reference the dictionary rather than inventing glyphs.
+- **Authenticity over pastiche**: Nsibidi symbols carry meaning. Only use glyphs from `src/content/nsibidi.ts`, each tied to a `Resource/nsibidi dictionary.pdf` entry; never invent, rotate or mirror glyphs, and never present a neo-Nsibidi compound as ancient (keep its `origin`). Netpoc uses the dictionary's symbols with credit: keep the source line in `NsibidiGlossary.vue` (and on any other surface showing glyphs), and redraw structures in our own stroke style rather than copying its artwork (see `docs/brand/nsibidi.md`).
 - **Glassmorphism + Ankara tension**: glass surfaces are translucent and restrained; Ankara is dense and saturated. Layer them intentionally (e.g. Ankara/Nsibidi pattern fields behind frosted glass panels) so neither overwhelms readability.
 - **Performance & a11y are not optional**: animation-heavy and responsive both required. Respect `prefers-reduced-motion`, maintain WCAG contrast over busy patterned backgrounds, and keep pattern assets optimized.

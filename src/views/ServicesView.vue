@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useReveal } from '@/composables/useReveal'
 import NsibidiPattern from '@/components/NsibidiPattern.vue'
 import GlassCard from '@/components/GlassCard.vue'
+import CultureFigure from '@/components/CultureFigure.vue'
 
 const root = ref<HTMLElement | null>(null)
 useReveal(root)
@@ -51,6 +52,11 @@ const services = [
   <div ref="root" class="page">
     <header class="page__head">
       <NsibidiPattern :opacity="0.06" color="var(--color-ivory)" />
+      <!-- Welcome party: two full figures flank the headline on a shared ground line -->
+      <div class="page__party" aria-hidden="true">
+        <CultureFigure class="page__figure page__figure--left reveal" name="man-headdress" animate height="100%" />
+        <CultureFigure class="page__figure page__figure--right reveal" name="woman-waving" mirror height="100%" />
+      </div>
       <div class="page__head-inner reveal">
         <span class="pill">Services</span>
         <h1>From the transistor to the touchscreen</h1>
@@ -85,6 +91,51 @@ const services = [
   overflow: hidden;
   text-align: center;
   padding: 4rem 1.5rem 2rem;
+  min-height: 380px;
+  display: grid;
+  align-content: center;
+}
+.page__party {
+  position: absolute;
+  inset: auto 0 0;
+  max-width: 1240px;
+  height: 340px;
+  margin: 0 auto;
+  pointer-events: none;
+}
+/* Ground line the figures stand on */
+.page__party::after {
+  content: '';
+  position: absolute;
+  left: 2%;
+  right: 2%;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-saffron) 55%, transparent) 15%,
+    transparent 32%,
+    transparent 68%,
+    color-mix(in srgb, var(--color-coral) 55%, transparent) 85%,
+    transparent
+  );
+}
+.page__figure {
+  position: absolute;
+  bottom: 0;
+}
+.page__figure--left {
+  left: 6%;
+}
+.page__figure--right {
+  right: 6%;
+  transition-delay: 120ms;
+}
+@media (max-width: 1100px) {
+  .page__party {
+    display: none;
+  }
 }
 .page__head-inner {
   position: relative;
