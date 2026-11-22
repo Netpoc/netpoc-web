@@ -2,7 +2,6 @@
 import { computed, reactive, watch } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 import SectionHead from './SectionHead.vue'
-import TbcCopy from './TbcCopy.vue'
 import { useFuelPay } from '@/composables/useFuelPay'
 import { track } from '@/lib/track'
 import { CALCULATOR, formatNaira, monthlyLoss, roundToThousand } from '@/content/fuelpay'
@@ -62,7 +61,7 @@ watchDebounced(
           <input v-model.number="input.litres" class="field" type="number" inputmode="numeric" min="0" step="50" />
         </label>
         <label class="calc__field">
-          <span>Diesel price (₦ per litre) <TbcCopy :text="CALCULATOR.priceNote" /></span>
+          <span>Diesel price, ₦ per litre ({{ CALCULATOR.priceNote }})</span>
           <input v-model.number="input.price" class="field" type="number" inputmode="numeric" min="0" step="1" />
         </label>
         <label class="calc__field">

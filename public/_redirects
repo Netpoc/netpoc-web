@@ -1,0 +1,3 @@
+# Netlify / Cloudflare Pages: real files (incl. per-route index.html) win; everything else is the SPA.
+/products/fuelpay  /fuelpay  301
+/*  /index.html  200

@@ -6,7 +6,7 @@ import { PROBLEM } from '@/content/fuelpay'
 
 const grid = ref<HTMLElement | null>(null)
 const reduced = usePreferredReducedMotion()
-const shown = ref(PROBLEM.stats.map(() => 0))
+const shown = ref(PROBLEM.stats.map((s) => (s.prefix ? s.value : 0)))
 let frame = 0
 
 const fmt = new Intl.NumberFormat('en-NG')
@@ -21,7 +21,8 @@ function run() {
   const tick = (now: number) => {
     const t = Math.min((now - start) / duration, 1)
     const eased = 1 - Math.pow(1 - t, 4)
-    shown.value = PROBLEM.stats.map((s) => Math.round(s.value * eased))
+    // Ranges (e.g. "45–50%") don't count up: "45–12%" reads as a wrong figure.
+    shown.value = PROBLEM.stats.map((s) => (s.prefix ? s.value : Math.round(s.value * eased)))
     if (t < 1) frame = requestAnimationFrame(tick)
   }
   frame = requestAnimationFrame(tick)

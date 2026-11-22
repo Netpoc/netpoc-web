@@ -20,10 +20,7 @@ import { FEATURES } from '@/content/fuelpay'
           <span class="feature__icon" :class="{ 'feature__icon--alert': f.icon === 'alert' }">
             <FpIcon :name="f.icon" :size="22" />
           </span>
-          <h3 class="feature__name">
-            {{ f.name }}
-            <span v-if="f.note" class="feature__note">{{ f.note }}</span>
-          </h3>
+          <h3 class="feature__name">{{ f.name }}</h3>
           <p class="feature__text">{{ f.text }}</p>
         </GlassCard>
       </li>
@@ -69,17 +66,6 @@ import { FEATURES } from '@/content/fuelpay'
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-}
-.feature__note {
-  font-family: var(--font-mono);
-  font-weight: 400;
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  color: var(--color-mist);
-  border: 1px solid color-mix(in srgb, var(--color-ivory) 18%, transparent);
 }
 .feature__text {
   margin: 0;

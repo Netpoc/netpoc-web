@@ -3,7 +3,8 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useReveal } from '@/composables/useReveal'
 import { provideFuelPay, segmentFromRoute } from '@/composables/useFuelPay'
-import { FAQ, FUELPAY_LINKS, SEO } from '@/content/fuelpay'
+import { FAQ, SEO } from '@/content/fuelpay'
+import { COMPANY } from '@/content/company'
 import FuelPayBar from '@/components/fuelpay/FuelPayBar.vue'
 import FuelPayHero from '@/components/fuelpay/FuelPayHero.vue'
 import ProblemStrip from '@/components/fuelpay/ProblemStrip.vue'
@@ -46,11 +47,10 @@ onMounted(() => {
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
       description: SEO.description,
-      url: FUELPAY_LINKS.canonical,
+      url: (import.meta.env.VITE_SITE_URL ?? window.location.origin).replace(/\/$/, '') + '/fuelpay',
       offers: { '@type': 'Offer', description: 'Contact for price' },
-      publisher: { '@type': 'Organization', name: 'Netpoc Inc' },
+      publisher: { '@type': 'Organization', name: COMPANY.legalName },
     },
-    { '@context': 'https://schema.org', '@type': 'Organization', name: 'Netpoc Inc' },
     {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',

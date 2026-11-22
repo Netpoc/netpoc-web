@@ -3,6 +3,9 @@ import logo from '@/assets/brand/netpoc-white.png'
 import NsibidiPattern from './NsibidiPattern.vue'
 import CultureFigure from './CultureFigure.vue'
 import NsibidiGlossary from './NsibidiGlossary.vue'
+import SocialLinks from './SocialLinks.vue'
+import { COMPANY } from '@/content/company'
+import { analyticsEnabled, openConsent } from '@/lib/consent'
 
 const year = new Date().getFullYear()
 
@@ -33,15 +36,16 @@ const columns = [
     <NsibidiPattern :opacity="0.05" :scale="170" color="var(--color-ivory)" />
     <div class="footer__inner">
       <div class="footer__brand">
-        <img :src="logo" alt="Πέτρος" class="footer__logo" />
+        <img :src="logo" alt="Πέτρος" lang="el" class="footer__logo" />
         <p class="footer__motto text-ankara">Value-Driven Innovation</p>
         <p class="footer__tagline">
           African tech engineered from silicon to software.
         </p>
+        <SocialLinks location="footer" class="footer__social" />
       </div>
 
       <div v-for="col in columns" :key="col.title" class="footer__col">
-        <h4 class="footer__heading">{{ col.title }}</h4>
+        <h2 class="footer__heading">{{ col.title }}</h2>
         <RouterLink
           v-for="link in col.links"
           :key="link.label"
@@ -61,7 +65,12 @@ const columns = [
     <NsibidiGlossary />
 
     <div class="footer__base">
-      <span>© {{ year }} Netpoc Inc Limited. All rights reserved.</span>
+      <span>
+        © {{ year }} {{ COMPANY.legalName }}. All rights reserved.
+        <button v-if="analyticsEnabled" type="button" class="footer__cookies" @click="openConsent">
+          Cookie settings
+        </button>
+      </span>
       <span class="footer__made">
         <svg
           class="footer__flag"
@@ -130,7 +139,9 @@ const columns = [
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-saffron);
-  margin-bottom: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 1rem;
 }
 .footer__col {
   display: flex;
@@ -173,6 +184,27 @@ const columns = [
   border-radius: 2px;
   flex-shrink: 0;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ivory) 14%, transparent);
+}
+.footer__social {
+  margin-top: 1.25rem;
+}
+.footer__cookies {
+  margin-left: 0.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--color-mist);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.footer__cookies:hover {
+  color: var(--color-ivory);
+}
+.footer__cookies:focus-visible {
+  outline: 2px solid var(--color-saffron);
+  outline-offset: 2px;
 }
 .footer__mark {
   font-family: var(--font-mono);

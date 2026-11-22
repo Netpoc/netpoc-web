@@ -6,6 +6,8 @@ import NsibidiPattern from '@/components/NsibidiPattern.vue'
 import AnkaraPattern from '@/components/AnkaraPattern.vue'
 import GlassCard from '@/components/GlassCard.vue'
 import CultureFigure from '@/components/CultureFigure.vue'
+import { HERO as FP_HERO, PRODUCT_DESCRIPTOR, PROBLEM, SEGMENTS, SEGMENT_CONTENT } from '@/content/fuelpay'
+import { track } from '@/lib/track'
 
 const root = ref<HTMLElement | null>(null)
 useReveal(root)
@@ -19,11 +21,15 @@ const services = [
   { tag: 'Grow', title: 'Agric Tech', desc: 'Data-driven tools that lift yields and connect farmers to markets.' },
 ]
 
+// Defensible figures only: our own count, plus the cited market numbers from the FuelPay page.
+const towerDiesel = PROBLEM.stats[0]!
+const tractors = PROBLEM.stats[2]!
 const stats = [
-  { value: '6+', label: 'Practice areas' },
-  { value: '100%', label: 'African-engineered' },
-  { value: '24/7', label: 'Connected systems' },
+  { value: '6', label: 'Practice areas' },
+  { value: `${towerDiesel.value}${towerDiesel.suffix} L`, label: 'Tower diesel / month, Nigeria' },
+  { value: tractors.value.toLocaleString('en-NG'), label: 'NAMP tractors' },
 ]
+const statSources = `Sources: ${towerDiesel.source}; ${tractors.source}.`
 </script>
 
 <template>
@@ -51,7 +57,7 @@ const stats = [
 
         <div class="hero__actions reveal">
           <RouterLink to="/contact" class="btn btn--primary">Start a project</RouterLink>
-          <RouterLink to="/services" class="btn btn--ghost">Explore our work →</RouterLink>
+          <RouterLink to="/fuelpay" class="btn btn--ghost">See FuelPay</RouterLink>
         </div>
 
         <ul class="hero__stats reveal">
@@ -60,6 +66,7 @@ const stats = [
             <span>{{ s.label }}</span>
           </li>
         </ul>
+        <p class="hero__sources reveal">{{ statSources }}</p>
       </div>
 
       <div class="hero__ankara" aria-hidden="true">
@@ -69,6 +76,46 @@ const stats = [
       <!-- Signature figure: stands in front of the Ankara sun and waves -->
       <div class="hero__figure reveal" style="transition-delay: 200ms">
         <CultureFigure name="woman-waving" animate height="100%" />
+      </div>
+    </section>
+
+    <!-- ============ FUELPAY (the product) ============ -->
+    <section class="section" aria-labelledby="fp-title">
+      <div class="fp reveal">
+        <div class="fp__pattern" aria-hidden="true">
+          <AnkaraPattern :scale="120" :opacity="0.9" />
+        </div>
+        <div class="fp__panel glass-strong">
+          <div class="fp__copy">
+            <span class="pill">{{ FP_HERO.eyebrow }} · {{ PRODUCT_DESCRIPTOR }}</span>
+            <h2 id="fp-title" class="fp__title">
+              {{ FP_HERO.title[0] }} {{ FP_HERO.title[1] }}
+              <span class="text-ankara">{{ FP_HERO.title[2] }}</span>
+            </h2>
+            <p class="fp__sub">{{ FP_HERO.sub }}</p>
+            <div class="fp__actions">
+              <RouterLink to="/fuelpay" class="btn btn--primary" @click="track('home_fuelpay_click', { cta: 'see' })">
+                See how FuelPay works
+              </RouterLink>
+              <RouterLink to="/fuelpay/book-poc" class="btn btn--outline" @click="track('home_fuelpay_click', { cta: 'poc' })">
+                {{ FP_HERO.primary }}
+              </RouterLink>
+            </div>
+          </div>
+
+          <ul class="fp__segments" aria-label="Who FuelPay is for">
+            <li v-for="id in SEGMENTS" :key="id">
+              <RouterLink
+                :to="{ path: '/fuelpay', hash: `#${id}` }"
+                class="fp__segment"
+                @click="track('home_fuelpay_click', { cta: 'segment', segment: id })"
+              >
+                <span class="fp__segment-label">{{ SEGMENT_CONTENT[id].label }}</span>
+                <span class="fp__segment-line">{{ SEGMENT_CONTENT[id].headline }}</span>
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -175,6 +222,11 @@ const stats = [
   color: var(--color-muted);
   font-family: var(--font-mono);
 }
+.hero__sources {
+  margin: 1rem 0 0;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
 .hero__figure {
   position: absolute;
   right: 6%;
@@ -234,6 +286,88 @@ const stats = [
 .card__desc {
   color: var(--color-mist);
   line-height: 1.6;
+}
+
+/* FuelPay band */
+.fp {
+  position: relative;
+}
+.fp__pattern {
+  position: absolute;
+  inset: -1.5rem -1.5rem -1.5rem 45%;
+  border-radius: 2rem;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 35%);
+}
+.fp__panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+  border-radius: 2rem;
+  padding: clamp(2rem, 5vw, 3.5rem);
+}
+.fp__title {
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  line-height: 1.08;
+  margin: 1.1rem 0 1rem;
+}
+.fp__sub {
+  color: var(--color-mist);
+  line-height: 1.7;
+  max-width: 52ch;
+}
+.fp__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+.fp__segments {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-ivory) 12%, transparent);
+}
+.fp__segments li {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ivory) 12%, transparent);
+}
+.fp__segment {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.1rem 0.25rem;
+  text-decoration: none;
+  color: inherit;
+  transition: padding 0.35s var(--ease-out-expo);
+}
+.fp__segment:hover {
+  padding-left: 0.75rem;
+}
+.fp__segment:focus-visible {
+  outline: 2px solid var(--color-saffron);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+.fp__segment-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-saffron);
+}
+.fp__segment-line {
+  color: var(--color-mist);
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+@media (max-width: 860px) {
+  .fp__panel {
+    grid-template-columns: 1fr;
+  }
+  .fp__pattern {
+    inset: -1rem -1rem 55% 30%;
+  }
 }
 
 /* CTA */

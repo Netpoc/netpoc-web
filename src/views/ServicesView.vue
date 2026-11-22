@@ -26,6 +26,7 @@ const services = [
     tag: 'IoT & Telematics',
     title: 'The physical world, online',
     points: ['Fleet & asset tracking', 'Sensor networks', 'Edge-to-cloud pipelines'],
+    product: { to: '/fuelpay', label: 'See FuelPay, built by this team' },
   },
   {
     id: 'ussd',
@@ -77,6 +78,9 @@ const services = [
         <ul class="svc__points">
           <li v-for="p in svc.points" :key="p">{{ p }}</li>
         </ul>
+        <RouterLink v-if="svc.product" :to="svc.product.to" class="svc__product">
+          {{ svc.product.label }}
+        </RouterLink>
       </GlassCard>
     </section>
   </div>
@@ -183,6 +187,16 @@ const services = [
   color: var(--color-mist);
   padding-left: 1.4rem;
   position: relative;
+}
+.svc__product {
+  display: inline-block;
+  margin-top: 1.25rem;
+  color: var(--color-saffron);
+  font-weight: 600;
+  text-underline-offset: 4px;
+}
+.svc__product:hover {
+  color: var(--color-ivory);
 }
 .svc__points li::before {
   content: '';

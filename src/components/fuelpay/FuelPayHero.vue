@@ -3,7 +3,7 @@ import NsibidiPattern from '@/components/NsibidiPattern.vue'
 import AnkaraPattern from '@/components/AnkaraPattern.vue'
 import CtaPair from './CtaPair.vue'
 import FpIcon from './FpIcon.vue'
-import { HERO } from '@/content/fuelpay'
+import { HERO, PRODUCT_DESCRIPTOR } from '@/content/fuelpay'
 
 /*
  * Mock tank trace: 14 days at 3-hour resolution for a 1,000 L tank.
@@ -58,7 +58,7 @@ const nowLitres = Math.round(levels[STEPS]!)
       <div class="hero__copy">
         <p class="pill glass reveal">
           <span class="pulse" aria-hidden="true" />
-          {{ HERO.eyebrow }} <span class="hero__tag">· Fuel &amp; Energy Monitoring</span>
+          {{ HERO.eyebrow }} <span class="hero__tag">· {{ PRODUCT_DESCRIPTOR }}</span>
         </p>
 
         <h1 class="hero__title reveal" style="transition-delay: 60ms">
@@ -93,7 +93,7 @@ const nowLitres = Math.round(levels[STEPS]!)
               <p class="dash__site">Ikeja Tower 04</p>
               <p class="dash__meta">Tank A · 1,000 L · calibrated</p>
             </div>
-            <span class="dash__live"><span class="pulse pulse--sm" aria-hidden="true" /> LIVE</span>
+            <span class="dash__live">Sample data</span>
           </header>
 
           <div class="dash__plot">
@@ -155,8 +155,8 @@ const nowLitres = Math.round(levels[STEPS]!)
             <p class="alert__meta">{{ HERO.alert.meta }}</p>
           </div>
         </div>
-        <figcaption class="sr-only">
-          Illustrative FuelPay dashboard. Simulated data.
+        <figcaption class="dash__caption">
+          Illustrative dashboard with simulated data, not a real site.
         </figcaption>
       </figure>
     </div>
@@ -294,11 +294,24 @@ const nowLitres = Math.round(levels[STEPS]!)
 .dash__live {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px dashed color-mix(in srgb, var(--color-saffron) 60%, transparent);
   font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.14em;
-  color: var(--color-emerald);
+  font-size: 0.68rem;
+  color: var(--color-saffron);
+  white-space: nowrap;
+}
+.dash__caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  max-width: 14rem;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: var(--color-mist);
 }
 .dash__chart {
   width: 100%;
@@ -453,6 +466,18 @@ const nowLitres = Math.round(levels[STEPS]!)
   }
   .alert {
     left: 0.75rem;
+  }
+}
+@media (max-width: 640px) {
+  /* Caption moves under the panel so it never collides with the alert card. */
+  .dash {
+    padding-bottom: 7.5rem;
+  }
+  .dash__caption {
+    position: static;
+    max-width: none;
+    margin-top: 0.6rem;
+    text-align: left;
   }
 }
 @media (max-width: 520px) {

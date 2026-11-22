@@ -1,5 +1,6 @@
 import { inject, provide, reactive, ref, type InjectionKey, type Ref } from 'vue'
 import { useRoute, useRouter, type LocationQuery } from 'vue-router'
+import { currentUtms, leadAttribution, type Attribution } from '@/lib/attribution'
 import { useMediaQuery } from '@vueuse/core'
 import { track } from '@/lib/track'
 import { skipScrollOnce } from '@/router'
@@ -14,8 +15,7 @@ export interface CalcValues {
   lossNaira: number
 }
 
-/** Hidden attribution fields: `utm_*`, referrer and page URL. */
-export type Attribution = Record<string, string>
+export type { Attribution } from '@/lib/attribution'
 
 interface FuelPayContext {
   segment: Ref<Segment | null>
@@ -30,16 +30,6 @@ interface FuelPayContext {
 }
 
 const KEY: InjectionKey<FuelPayContext> = Symbol('fuelpay')
-
-/** Pull `utm_*` params out of a route query (first value wins). */
-export function utmFromQuery(query: LocationQuery): Attribution {
-  const out: Attribution = {}
-  for (const [k, v] of Object.entries(query)) {
-    const value = Array.isArray(v) ? v[0] : v
-    if (k.startsWith('utm_') && typeof value === 'string') out[k] = value.slice(0, 100)
-  }
-  return out
-}
 
 export function segmentFromRoute(hash: string, query: LocationQuery): Segment | null {
   const fromHash = hash.replace('#', '')
@@ -60,11 +50,8 @@ export function provideFuelPay() {
   const segment = ref<Segment | null>(segmentFromRoute(route.hash, route.query))
   const calc = ref<CalcValues | null>(null)
   const pocOpen = ref(false)
-  const attribution = reactive<Attribution>({
-    ...utmFromQuery(route.query),
-    referrer: typeof document !== 'undefined' ? document.referrer : '',
-    page_url: typeof window !== 'undefined' ? window.location.origin + route.path : route.path,
-  })
+  // UTMs, landing page and referrer from this visit's first page (lib/attribution).
+  const attribution = reactive<Attribution>(leadAttribution(route.query, route.path))
 
   /**
    * Switch segment and mirror it in the URL hash (shareable) without the
@@ -93,7 +80,7 @@ export function provideFuelPay() {
       return
     }
     // Low-end Android: a full page beats a modal.
-    const query: Record<string, string> = { ...utmFromQuery(route.query) }
+    const query: Record<string, string> = { ...currentUtms(route.query) }
     if (segment.value) query.segment = segment.value
     if (calc.value) {
       query.calc_sites = String(calc.value.sites)
@@ -108,7 +95,7 @@ export function provideFuelPay() {
     if (isPlaceholder(FUELPAY_LINKS.demoSignup)) return '#demo'
     const url = new URL(FUELPAY_LINKS.demoSignup)
     if (segment.value) url.searchParams.set('segment', segment.value)
-    for (const [k, v] of Object.entries(utmFromQuery(route.query))) url.searchParams.set(k, v)
+    for (const [k, v] of Object.entries(currentUtms(route.query))) url.searchParams.set(k, v)
     if (!url.searchParams.has('utm_source')) {
       url.searchParams.set('utm_source', 'website')
       url.searchParams.set('utm_medium', 'fuelpay')

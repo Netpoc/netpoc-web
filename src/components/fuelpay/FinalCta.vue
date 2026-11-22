@@ -4,6 +4,7 @@ import CultureFigure from '@/components/CultureFigure.vue'
 import CtaPair from './CtaPair.vue'
 import TbcCopy from './TbcCopy.vue'
 import { CONTACT, FINAL_CTA, isPlaceholder } from '@/content/fuelpay'
+import { COMPANY } from '@/content/company'
 </script>
 
 <template>
@@ -17,7 +18,7 @@ import { CONTACT, FINAL_CTA, isPlaceholder } from '@/content/fuelpay'
         <CtaPair class="final__ctas" location="final" />
         <p class="final__contact">
           Prefer to talk? Call
-          <a v-if="!isPlaceholder(CONTACT.phone)" :href="`tel:${CONTACT.phone}`">{{ CONTACT.phone }}</a>
+          <a v-if="!isPlaceholder(CONTACT.phone)" :href="`tel:${COMPANY.phoneIntl}`">{{ CONTACT.phone }}</a>
           <TbcCopy v-else :text="CONTACT.phone" />
           or email
           <a v-if="!isPlaceholder(CONTACT.email)" :href="`mailto:${CONTACT.email}`">{{ CONTACT.email }}</a>

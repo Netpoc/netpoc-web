@@ -14,7 +14,8 @@
   /* Ink */
   --color-ivory: #f5f2ea;
   --color-mist: #b6b2cf;
-  --color-muted: #837fa6;
+  /* Small labels: ≥5.4:1 on night-3 glass, ≥6:1 on night (WCAG AA). Was #837fa6 (4.4:1 on glass). */
+  --color-muted: #948fb6;
 
   /* Ankara-inspired accents */
   --color-saffron: #f7b733;
@@ -81,6 +82,27 @@
 }
 
 @layer components {
+  /* Skip link: hidden until keyboard focus, then pinned top-left above the nav. */
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 100;
+    padding: 0.7rem 1.1rem;
+    border-radius: 999px;
+    background: var(--color-saffron);
+    color: var(--color-void);
+    font-weight: 700;
+    text-decoration: none;
+    transform: translateY(-200%);
+    transition: transform 0.2s ease;
+  }
+  .skip-link:focus-visible {
+    transform: none;
+    outline: 2px solid var(--color-ivory);
+    outline-offset: 2px;
+  }
+
   /* Frosted glass panel — the core glassmorphism primitive */
   .glass {
     background: linear-gradient(

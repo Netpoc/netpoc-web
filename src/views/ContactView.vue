@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { useReveal } from '@/composables/useReveal'
+import { submitForm } from '@/lib/submit'
+import { track } from '@/lib/track'
+import { leadAttribution } from '@/lib/attribution'
 import NsibidiPattern from '@/components/NsibidiPattern.vue'
 import CultureFigure from '@/components/CultureFigure.vue'
+import SocialLinks from '@/components/SocialLinks.vue'
+import { ADDRESS_LINE, COMPANY } from '@/content/company'
 
 const root = ref<HTMLElement | null>(null)
 useReveal(root)
 
-const form = reactive({ name: '', email: '', interest: 'System Design', message: '' })
-const submitted = ref(false)
-
 const interests = [
+  'FuelPay (diesel, power & tractor monitoring)',
   'System Design',
   'System on Chip',
   'IoT & Telematics',
@@ -19,9 +23,38 @@ const interests = [
   'Agric Tech',
 ]
 
-function submit() {
-  // Front-end stub: wire this to a backend / email service when available.
-  submitted.value = true
+// `/contact?interest=fuelpay` preselects FuelPay.
+const route = useRoute()
+const preset = route.query.interest === 'fuelpay' ? interests[0]! : 'System Design'
+
+const form = reactive({ name: '', email: '', interest: preset, message: '', website: '' })
+const submitted = ref(false)
+const submitting = ref(false)
+const failed = ref(false)
+
+async function submit() {
+  failed.value = false
+  // Honeypot: bots fill the hidden field; pretend success, send nothing.
+  if (form.website) {
+    submitted.value = true
+    return
+  }
+  submitting.value = true
+  try {
+    await submitForm('contact', {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      interest: form.interest,
+      message: form.message.trim(),
+      ...leadAttribution(route.query, route.path),
+    })
+    submitted.value = true
+    track('contact_form_submit', { interest: form.interest })
+  } catch {
+    failed.value = true
+  } finally {
+    submitting.value = false
+  }
 }
 </script>
 
@@ -38,6 +71,17 @@ function submit() {
           between. We'll get back to you quickly.
         </p>
         <a class="contact__email" href="mailto:hello@netpoc.com">hello@netpoc.com</a>
+        <dl class="contact__details">
+          <div>
+            <dt>Phone</dt>
+            <dd><a :href="`tel:${COMPANY.phoneIntl}`">{{ COMPANY.phone }}</a></dd>
+          </div>
+          <div>
+            <dt>Office</dt>
+            <dd>{{ ADDRESS_LINE }}</dd>
+          </div>
+        </dl>
+        <SocialLinks location="contact" class="contact__social" />
         <CultureFigure class="contact__figure" name="couple-with-pots" height="340px" />
       </div>
 
@@ -60,7 +104,23 @@ function submit() {
           <span>Project details</span>
           <textarea v-model="form.message" class="field" rows="4" required placeholder="What are you building?" />
         </label>
-        <button type="submit" class="btn btn--primary">Send message</button>
+        <!-- Honeypot: hidden from people and assistive tech -->
+        <input
+          v-model="form.website"
+          class="hp"
+          type="text"
+          name="website"
+          tabindex="-1"
+          autocomplete="off"
+          aria-hidden="true"
+        />
+        <p v-if="failed" class="contact__err" role="alert">
+          We couldn't send your message. Please try again, or email us at
+          <a href="mailto:hello@netpoc.com">hello@netpoc.com</a>.
+        </p>
+        <button type="submit" class="btn btn--primary" :disabled="submitting" :aria-busy="submitting">
+          {{ submitting ? 'Sending…' : 'Send message' }}
+        </button>
       </form>
 
       <div v-else class="contact__form glass-strong contact__thanks">
@@ -105,6 +165,31 @@ function submit() {
     display: none;
   }
 }
+.contact__details {
+  margin: 1.25rem 0 0;
+  display: grid;
+  gap: 0.6rem;
+}
+.contact__details div {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 0.75rem;
+}
+.contact__details dt {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+.contact__details dd {
+  margin: 0;
+  color: var(--color-mist);
+}
+.contact__details a {
+  color: var(--color-ivory);
+  text-underline-offset: 3px;
+}
+.contact__social {
+  margin-top: 1.25rem;
+}
 .contact__email {
   display: inline-block;
   margin-top: 1.5rem;
@@ -126,6 +211,21 @@ label {
   gap: 0.45rem;
   font-size: 0.85rem;
   color: var(--color-mist);
+}
+.hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.contact__err {
+  color: var(--color-coral);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.contact__err a {
+  color: inherit;
 }
 .contact__thanks {
   justify-content: center;

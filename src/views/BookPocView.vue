@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import NsibidiPattern from '@/components/NsibidiPattern.vue'
 import PocForm from '@/components/fuelpay/PocForm.vue'
-import { utmFromQuery } from '@/composables/useFuelPay'
+import { leadAttribution } from '@/lib/attribution'
 import { FUELPAY_LINKS, isPlaceholder, isSegment } from '@/content/fuelpay'
 
 /** Full-page PoC form — used on narrow screens instead of the modal. */
@@ -16,11 +16,7 @@ const calc =
   num(q.calc_sites) !== null && num(q.calc_loss_naira) !== null
     ? { sites: num(q.calc_sites)!, litres: num(q.calc_litres) ?? 0, lossNaira: num(q.calc_loss_naira)! }
     : null
-const attribution = {
-  ...utmFromQuery(q),
-  referrer: document.referrer,
-  page_url: window.location.origin + '/fuelpay',
-}
+const attribution = leadAttribution(q, '/fuelpay')
 
 const demoHref = computed(() => {
   if (isPlaceholder(FUELPAY_LINKS.demoSignup)) return '/fuelpay#demo'

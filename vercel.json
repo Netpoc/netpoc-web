@@ -1,0 +1,5 @@
+{
+  "cleanUrls": true,
+  "redirects": [{ "source": "/products/fuelpay", "destination": "/fuelpay", "permanent": true }],
+  "rewrites": [{ "source": "/((?!.*\\.).*)", "destination": "/index.html" }]
+}

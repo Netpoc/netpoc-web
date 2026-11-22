@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import { SEO } from '@/content/fuelpay'
+import { DEFAULT_OG_IMAGE, NOT_FOUND_SEO, ROUTE_SEO } from '@/content/seo'
+import { trackPageView } from '@/lib/track'
+import { captureFirstTouch } from '@/lib/attribution'
 
-const DEFAULT_DESCRIPTION =
-  'Netpoc Inc Limited — an innovation- and value-driven African tech company. System Design, System on Chip, IoT, USSD Solutions, Telematics, and Agric Tech.'
+const SITE_URL = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '')
 
 /** Set before an in-page hash update (e.g. FuelPay segment tabs) so the router doesn't scroll. */
 let skipNextScroll = false
@@ -29,24 +30,24 @@ const router = createRouter({
     return { top: 0, behavior: 'smooth' }
   },
   routes: [
-    { path: '/', name: 'home', component: HomeView, meta: { title: 'Netpoc — African Innovation, Engineered.', nsibidi: 'welcome' } },
+    { path: '/', name: 'home', component: HomeView, meta: { ...ROUTE_SEO['/'], nsibidi: 'welcome' } },
     {
       path: '/services',
       name: 'services',
       component: () => import('@/views/ServicesView.vue'),
-      meta: { title: 'Services — Netpoc', nsibidi: 'craft' },
+      meta: { ...ROUTE_SEO['/services'], nsibidi: 'craft' },
     },
     {
       path: '/fuelpay',
       name: 'fuelpay',
       component: () => import('@/views/FuelPayView.vue'),
-      meta: { title: SEO.title, description: SEO.description, ogImage: SEO.ogImage, nsibidi: 'value' },
+      meta: { ...ROUTE_SEO['/fuelpay'], nsibidi: 'value' },
     },
     {
       path: '/fuelpay/book-poc',
       name: 'fuelpay-book-poc',
       component: () => import('@/views/BookPocView.vue'),
-      meta: { title: 'Book a FuelPay PoC · Netpoc', description: SEO.description, nsibidi: 'value' },
+      meta: { ...ROUTE_SEO['/fuelpay/book-poc'], nsibidi: 'value' },
     },
     // 301 at the host level too; this keeps client-side links working.
     { path: '/products/fuelpay', redirect: (to) => ({ path: '/fuelpay', query: to.query, hash: to.hash }) },
@@ -58,13 +59,19 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: () => import('@/views/AboutView.vue'),
-      meta: { title: 'About — Netpoc', nsibidi: 'people' },
+      meta: { ...ROUTE_SEO['/about'], nsibidi: 'people' },
     },
     {
       path: '/contact',
       name: 'contact',
       component: () => import('@/views/ContactView.vue'),
-      meta: { title: 'Contact — Netpoc', nsibidi: 'dialogue' },
+      meta: { ...ROUTE_SEO['/contact'], nsibidi: 'dialogue' },
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/NotFoundView.vue'),
+      meta: { ...NOT_FOUND_SEO, noindex: true, nsibidi: 'welcome' },
     },
   ],
 })
@@ -80,16 +87,21 @@ function setMeta(attr: 'name' | 'property', key: string, content: string) {
 }
 
 router.afterEach((to) => {
-  const title = (to.meta.title as string | undefined) ?? document.title
-  const description = (to.meta.description as string | undefined) ?? DEFAULT_DESCRIPTION
-  const url = window.location.origin + to.path
+  captureFirstTouch(to.path, to.query)
+  const origin = SITE_URL ?? window.location.origin
+  const title = to.meta.title ?? document.title
+  const description = to.meta.description ?? ROUTE_SEO['/'].description
+  const url = origin + to.path
   document.title = title
   setMeta('name', 'description', description)
   setMeta('property', 'og:title', title)
   setMeta('property', 'og:description', description)
   setMeta('property', 'og:url', url)
-  setMeta('property', 'og:image', window.location.origin + ((to.meta.ogImage as string | undefined) ?? '/og-logo.png'))
-  setMeta('name', 'twitter:card', 'summary_large_image')
+  setMeta('property', 'og:image', origin + (to.meta.ogImage ?? DEFAULT_OG_IMAGE))
+  setMeta('name', 'twitter:title', title)
+  setMeta('name', 'twitter:description', description)
+  setMeta('name', 'twitter:image', origin + (to.meta.ogImage ?? DEFAULT_OG_IMAGE))
+  setMeta('name', 'robots', to.meta.noindex ? 'noindex' : 'index, follow')
 
   let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
   if (!canonical) {
@@ -98,6 +110,8 @@ router.afterEach((to) => {
     document.head.appendChild(canonical)
   }
   canonical.href = url
+
+  trackPageView()
 })
 
 export default router

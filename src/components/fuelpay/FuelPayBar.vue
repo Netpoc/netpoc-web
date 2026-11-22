@@ -4,7 +4,7 @@ import { onClickOutside, onKeyStroke, useWindowScroll } from '@vueuse/core'
 import CtaPair from './CtaPair.vue'
 import FpIcon from './FpIcon.vue'
 import { useFuelPay } from '@/composables/useFuelPay'
-import { FUELPAY_LINKS, SEGMENTS, SEGMENT_CONTENT, isPlaceholder, type Segment } from '@/content/fuelpay'
+import { FUELPAY_LINKS, PRODUCT_DESCRIPTOR, SEGMENTS, SEGMENT_CONTENT, isPlaceholder, type Segment } from '@/content/fuelpay'
 
 const { selectSegment, scrollToSection } = useFuelPay()
 const { y } = useWindowScroll()
@@ -31,7 +31,7 @@ function goSegment(id: Segment) {
       <button type="button" class="bar__brand" @click="scrollToSection('top')">
         <span class="bar__mark" aria-hidden="true" />
         FuelPay
-        <span class="bar__tag">Fuel &amp; Energy Monitoring</span>
+        <span class="bar__tag">{{ PRODUCT_DESCRIPTOR }}</span>
       </button>
 
       <nav class="bar__links" aria-label="FuelPay">
@@ -55,12 +55,8 @@ function goSegment(id: Segment) {
         </div>
         <button type="button" class="bar__link" @click="scrollToSection('how-it-works')">How it works</button>
         <button type="button" class="bar__link" @click="scrollToSection('faq')">FAQ</button>
-        <a
-          class="bar__link"
-          :href="loginHref"
-          :aria-disabled="!loginHref || undefined"
-          :title="loginHref ? undefined : `Placeholder: ${FUELPAY_LINKS.appLogin}`"
-        >Log in</a>
+        <!-- Hidden until the FuelPay app exists (FUELPAY_LINKS.appLogin is a placeholder). -->
+        <a v-if="loginHref" class="bar__link" :href="loginHref">Log in</a>
       </nav>
 
       <CtaPair location="sticky" size="sm" class="bar__ctas" />
@@ -159,11 +155,6 @@ function goSegment(id: Segment) {
 .bar__link:hover {
   color: var(--color-ivory);
   background: color-mix(in srgb, var(--color-ivory) 6%, transparent);
-}
-.bar__link[aria-disabled='true'] {
-  cursor: help;
-  text-decoration: underline dashed color-mix(in srgb, var(--color-coral) 70%, transparent);
-  text-underline-offset: 4px;
 }
 .bar__link:focus-visible,
 .bar__brand:focus-visible,

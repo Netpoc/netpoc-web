@@ -9,6 +9,8 @@
  * values. Replace a placeholder by editing the string — no template changes needed.
  */
 
+import { ADDRESS_LINE, COMPANY } from './company'
+
 export type Segment = 'towers' | 'enterprise' | 'tractors'
 export const SEGMENTS: Segment[] = ['towers', 'enterprise', 'tractors']
 
@@ -33,10 +35,10 @@ export const FUELPAY_LINKS = {
 }
 
 export const CONTACT = {
-  phone: '[PHONE]',
+  phone: COMPANY.phone,
   email: '[SALES_EMAIL]',
   whatsapp: '[WHATSAPP_NUMBER]',
-  address: '[Registered address]',
+  address: ADDRESS_LINE,
   rc: '[CAC number]',
 }
 
@@ -46,15 +48,33 @@ export function isPlaceholder(value: string) {
 }
 
 /* ------------------------------------------------------------------ */
+/* One descriptor and one diesel price, used everywhere on the site     */
+/* ------------------------------------------------------------------ */
+
+/** The product's one-line descriptor: SEO title, hero pill, sticky bar, Home. */
+export const PRODUCT_DESCRIPTOR = 'Diesel, Power & Tractor Monitoring'
+
+/**
+ * The single diesel price quoted on the site (segment proof lines and the
+ * calculator default). CFO: update monthly, and change `asOf` + `source` with it.
+ */
+export const DIESEL_PRICE = {
+  perLitre: 1700,
+  asOf: 'Oct 2026',
+  source: 'Dangote refinery diesel price, 7 Oct 2026',
+}
+const dieselNaira = `₦${DIESEL_PRICE.perLitre.toLocaleString('en-NG')}`
+
+/* ------------------------------------------------------------------ */
 /* SEO (§8)                                                            */
 /* ------------------------------------------------------------------ */
 
 export const SEO = {
-  title: 'FuelPay: Diesel, Power & Tractor Monitoring in Nigeria · Netpoc',
+  title: `FuelPay: ${PRODUCT_DESCRIPTOR} in Nigeria · Netpoc`,
   description:
     'Stop diesel theft and track power and tractors across all your sites. FuelPay by Netpoc: live alerts, audit-ready reports. Book a PoC.',
-  /** TODO: replace with a 1200×630 hero visual with logo. */
-  ogImage: '/og-logo.png',
+  /** 1200×630 social preview (public/og-image.png). */
+  ogImage: '/og-image.png',
 }
 
 /* ------------------------------------------------------------------ */
@@ -193,8 +213,8 @@ export const SEGMENT_CONTENT: Record<Segment, SegmentContent> = {
       },
     ],
     proof:
-      'At ~800 litres a site a month, a typical tower burns about ₦1.3M of diesel monthly. Recovering just 10% pays for FuelPay several times over.',
-    proofSource: 'Diesel at ₦1,661/L, GlobalPetrolPrices Aug 2026',
+      `At ~800 litres a site a month and ${dieselNaira} a litre, a typical tower burns about ₦${((800 * DIESEL_PRICE.perLitre) / 1e6).toFixed(1)}M of diesel monthly. Recovering just 10% pays for FuelPay several times over.`,
+    proofSource: `Diesel at ${dieselNaira}/L: ${DIESEL_PRICE.source}`,
     cta: 'Book a tower PoC',
     demoCta: 'Or try the demo with a tower site',
   },
@@ -242,8 +262,8 @@ export const SEGMENT_CONTENT: Record<Segment, SegmentContent> = {
       },
     ],
     proof:
-      "Diesel is now close to ₦2,000/litre for many businesses. A generator you can't see is a cost you can't control. [TO CONFIRM: use the current pump price at go-live]",
-    proofSource: "BusinessDay / manufacturers' reports",
+      `Diesel now costs ${dieselNaira} a litre or more, before delivery to your branch. A generator you can't see is a cost you can't control.`,
+    proofSource: `Diesel at ${dieselNaira}/L: ${DIESEL_PRICE.source}`,
     cta: 'Book a PoC for your branches',
     demoCta: 'Or try the demo with a branch',
   },
@@ -390,7 +410,7 @@ export const FEATURES = {
     { icon: 'map', name: 'Hectares & tracks', text: 'Measured work per job, with the GPS track kept as evidence.' },
     { icon: 'file', name: 'Reports & exports', text: 'Monthly loss, audit and billing reports in PDF and Excel.' },
     { icon: 'shield', name: 'Secure by design', text: 'Role-based access, encrypted data, NDPA-compliant processing.' },
-    { icon: 'code', name: 'Open API', text: 'Feed FuelPay data into your NOC, ERP or billing app.', note: 'Enterprise plan' },
+    { icon: 'code', name: 'Open API', text: 'Feed FuelPay data into your NOC, ERP or billing app.' },
   ],
 }
 
@@ -400,8 +420,8 @@ export const FEATURES = {
 
 export const CALCULATOR = {
   title: 'How much diesel could you be losing?',
-  defaults: { sites: 20, litres: 800, price: 1661, lossPct: 10 },
-  priceNote: '[CURRENT_PRICE]',
+  defaults: { sites: 20, litres: 800, price: DIESEL_PRICE.perLitre, lossPct: 10 },
+  priceNote: `${DIESEL_PRICE.asOf} price`,
   line: 'A FuelPay PoC measures your real number in 60 days.',
   disclaimer: 'Estimate only. Actual losses vary by site.',
   tractorLine: 'For tractor fleets, ask us about per-hectare billing accuracy.',

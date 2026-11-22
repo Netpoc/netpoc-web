@@ -1,10 +1,23 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useWindowScroll } from '@vueuse/core'
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { onKeyStroke, useMediaQuery, useWindowScroll } from '@vueuse/core'
 import logo from '@/assets/brand/netpoc-white.png'
 
 const { y } = useWindowScroll()
 const open = ref(false)
+const isMobile = useMediaQuery('(max-width: 760px)')
+const toggle = ref<HTMLButtonElement | null>(null)
+
+// Escape closes the mobile menu and returns focus to its toggle.
+onKeyStroke('Escape', () => {
+  if (!open.value) return
+  open.value = false
+  toggle.value?.focus()
+})
+// Any navigation (including back/forward) closes it.
+const route = useRoute()
+watch(() => route.fullPath, () => (open.value = false))
 
 const links = [
   { to: '/services', label: 'Services' },
@@ -18,10 +31,30 @@ const links = [
   <header class="nav" :class="{ 'nav--solid': y > 24 }">
     <div class="nav__inner">
       <RouterLink to="/" class="nav__brand" @click="open = false">
-        <img :src="logo" alt="Πέτρος" class="nav__logo" />
+        <img :src="logo" alt="Πέτρος" lang="el" class="nav__logo" />
       </RouterLink>
 
-      <nav class="nav__links" :class="{ 'nav__links--open': open }">
+      <!-- Toggle precedes the menu so, once opened, Tab moves straight into its links. -->
+      <button
+        ref="toggle"
+        type="button"
+        class="nav__toggle"
+        :aria-expanded="open"
+        aria-controls="site-menu"
+        aria-label="Menu"
+        @click="open = !open"
+      >
+        <span :class="{ 'is-open': open }" />
+      </button>
+
+      <!-- Closed mobile menu is inert: hidden links can't take focus or be read out. -->
+      <nav
+        id="site-menu"
+        class="nav__links"
+        :class="{ 'nav__links--open': open }"
+        aria-label="Main"
+        :inert="(isMobile && !open) || undefined"
+      >
         <RouterLink
           v-for="link in links"
           :key="link.to"
@@ -35,15 +68,6 @@ const links = [
           Start a project
         </RouterLink>
       </nav>
-
-      <button
-        class="nav__toggle"
-        :aria-expanded="open"
-        aria-label="Toggle navigation"
-        @click="open = !open"
-      >
-        <span :class="{ 'is-open': open }" />
-      </button>
     </div>
   </header>
 </template>

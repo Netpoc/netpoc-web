@@ -44,7 +44,8 @@ const values = [
       </div>
     </section>
 
-    <section class="values">
+    <section class="values" aria-labelledby="values-title">
+      <h2 id="values-title" class="values__heading reveal">What we value</h2>
       <GlassCard
         v-for="(v, i) in values"
         :key="v.title"
@@ -108,6 +109,11 @@ const values = [
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.5rem;
   padding: 0 1.5rem 2rem;
+}
+.values__heading {
+  grid-column: 1 / -1;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  margin: 1rem 0 0.25rem;
 }
 .values__title {
   font-size: 1.3rem;

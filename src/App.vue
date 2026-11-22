@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import SiteNav from '@/components/SiteNav.vue'
 import SiteFooter from '@/components/SiteFooter.vue'
+import ConsentBanner from '@/components/ConsentBanner.vue'
+
+/** Move focus (not just scroll) past the nav, without a router hash navigation. */
+function skipToMain() {
+  const main = document.getElementById('main')
+  main?.focus({ preventScroll: true })
+  main?.scrollIntoView()
+}
 </script>
 
 <template>
@@ -12,9 +20,10 @@ import SiteFooter from '@/components/SiteFooter.vue'
       <span class="aurora__blob aurora__blob--emerald" />
     </div>
 
+    <a href="#main" class="skip-link" @click.prevent="skipToMain">Skip to content</a>
     <SiteNav />
 
-    <main>
+    <main id="main" tabindex="-1">
       <RouterView v-slot="{ Component }">
         <Transition name="page" mode="out-in">
           <component :is="Component" />
@@ -23,10 +32,14 @@ import SiteFooter from '@/components/SiteFooter.vue'
     </main>
 
     <SiteFooter />
+    <ConsentBanner />
   </div>
 </template>
 
 <style scoped>
+main:focus {
+  outline: none;
+}
 .app {
   position: relative;
   min-height: 100vh;

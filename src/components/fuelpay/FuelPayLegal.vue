@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import TbcCopy from './TbcCopy.vue'
 import { CONTACT, FUELPAY_LINKS, isPlaceholder } from '@/content/fuelpay'
+import { COMPANY } from '@/content/company'
 
 const links = [
   { label: 'Privacy Policy', href: FUELPAY_LINKS.privacy },
@@ -12,7 +13,7 @@ const links = [
 <template>
   <div class="legal">
     <p>
-      Netpoc Inc · <TbcCopy :text="CONTACT.address" /> · RC <TbcCopy :text="CONTACT.rc" />
+      {{ COMPANY.legalName }} · <TbcCopy :text="CONTACT.address" /> · RC <TbcCopy :text="CONTACT.rc" />
     </p>
     <ul>
       <li v-for="l in links" :key="l.label">
@@ -21,7 +22,7 @@ const links = [
       </li>
       <li><RouterLink to="/contact">Contact</RouterLink></li>
     </ul>
-    <p class="legal__note">FuelPay is a product of Netpoc Inc.</p>
+    <p class="legal__note">FuelPay is a product of {{ COMPANY.legalName }}.</p>
   </div>
 </template>
 

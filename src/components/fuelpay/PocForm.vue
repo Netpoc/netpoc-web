@@ -268,7 +268,8 @@ async function onSubmit() {
     </div>
 
     <p v-if="failed" class="err" role="alert">
-      We couldn't send your request. Your answers are saved on this device; please try again.
+      We couldn't send your request. Please try again, or email us at
+      <a href="mailto:hello@netpoc.com?subject=FuelPay%20PoC%20request">hello@netpoc.com</a>.
     </p>
 
     <button type="submit" class="btn btn--primary submit" :disabled="submitting" :aria-busy="submitting">

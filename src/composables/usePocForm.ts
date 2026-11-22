@@ -1,6 +1,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 import { track } from '@/lib/track'
+import { submitForm } from '@/lib/submit'
 import type { FormSegment } from '@/content/fuelpay'
 import type { Attribution, CalcValues } from '@/composables/useFuelPay'
 
@@ -70,19 +71,14 @@ function clearDraft() {
   }
 }
 
-/** POST with one retry on network failure. */
-async function send(payload: Record<string, unknown>) {
-  // TODO: POST to the PoC API once it is available, e.g.
-  //   const res = await fetch(import.meta.env.VITE_POC_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-  //   if (!res.ok) throw new Error(`PoC submit failed: ${res.status}`)
-  const attempt = () => new Promise<void>((resolve) => setTimeout(resolve, 700))
-  try {
-    await attempt()
-  } catch {
-    await attempt()
-  }
-  if (import.meta.env.DEV) console.debug('[poc] payload', payload)
-}
+/**
+ * Fields kept in the on-device draft. Personal data (name, email, phone,
+ * job title, free-text message) is never written to storage before consent.
+ */
+const DRAFT_FIELDS: PocField[] = [
+  'company', 'segment', 'states', 'sites', 'generator', 'interests', 'tractors',
+  'trackersFitted', 'trackerMake', 'problems', 'start', 'heard',
+]
 
 export function usePocForm(opts: {
   segment?: FormSegment | null
@@ -90,7 +86,9 @@ export function usePocForm(opts: {
   attribution: Attribution
 }) {
   const draft = readDraft()
-  const model = reactive<PocModel>({ ...blank(), ...draft, consent: false, website: '' })
+  // Pick only allowed keys, so an old draft that held personal data is ignored.
+  const safeDraft = draft ? Object.fromEntries(DRAFT_FIELDS.filter((k) => k in draft).map((k) => [k, draft[k]])) : {}
+  const model = reactive<PocModel>({ ...blank(), ...safeDraft })
   // A deep-linked segment beats whatever was in the draft.
   if (opts.segment) model.segment = opts.segment
 
@@ -125,8 +123,9 @@ export function usePocForm(opts: {
     () => {
       if (submitted.value) return
       try {
-        // Consent must be given fresh each time; the honeypot is never stored.
-        localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...model, consent: false, website: '' }))
+        // Only non-personal fields; consent and the honeypot are never stored.
+        const draft = Object.fromEntries(DRAFT_FIELDS.map((k) => [k, model[k]]))
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
       } catch {
         /* private mode / blocked storage — drafts are a convenience only */
       }
@@ -212,7 +211,7 @@ export function usePocForm(opts: {
     }
 
     try {
-      await send(payload)
+      await submitForm('poc', payload)
       submitted.value = true
       clearDraft()
       track('poc_form_submit', {
