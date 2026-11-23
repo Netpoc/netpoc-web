@@ -4,6 +4,8 @@
  * radiating accents in the brand's wax-print palette. Used as a saturated
  * counterpoint behind / beside frosted glass surfaces.
  */
+import { useId } from 'vue'
+
 withDefaults(
   defineProps<{
     opacity?: number
@@ -11,18 +13,22 @@ withDefaults(
   }>(),
   { opacity: 1, scale: 120 },
 )
+
+// Unique per instance: two fields on one page must not share a <pattern> id.
+const id = `ankara-${useId()}`
 </script>
 
 <template>
   <svg class="ankara-field" :style="{ opacity }" aria-hidden="true" focusable="false">
     <defs>
+      <!-- Tile is drawn on a 120-unit grid; `scale` resizes it. -->
       <pattern
-        id="ankara-tile"
-        :width="scale"
-        :height="scale"
+        :id="id"
+        width="120"
+        height="120"
         patternUnits="userSpaceOnUse"
+        :patternTransform="`scale(${scale / 120})`"
       >
-        <rect :width="scale" :height="scale" fill="transparent" />
         <!-- concentric diamonds -->
         <g stroke-width="3" fill="none">
           <rect
@@ -59,7 +65,7 @@ withDefaults(
         </g>
       </pattern>
     </defs>
-    <rect width="100%" height="100%" fill="url(#ankara-tile)" />
+    <rect width="100%" height="100%" :fill="`url(#${id})`" />
   </svg>
 </template>
 

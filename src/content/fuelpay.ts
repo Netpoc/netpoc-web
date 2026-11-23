@@ -24,8 +24,8 @@ export function isSegment(value: unknown): value is Segment {
 
 export const FUELPAY_LINKS = {
   /** Demo sign-up. `segment` + UTM params are appended automatically. */
-  demoSignup: '[DEMO_APP_URL]/signup',
-  appLogin: '[APP_LOGIN_URL]',
+  demoSignup: 'https://fuelpays.netlify.app/demo',
+  appLogin: 'https://fuelpays.netlify.app/',
   supportedDevices: '[LINK: supported devices list]',
   calendar: '[CALENDAR_LINK]',
   privacy: '[PRIVACY_POLICY_URL]',
